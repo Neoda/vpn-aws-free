@@ -1,3 +1,16 @@
 region        = "us-east-1"
 instance_type = "t2.micro"
-ssh_source_ip = "0.0.0.0/0"  # Restrict to your IP for security
+ssh_source_ip = "YOUR_IP/32"  # Restrict to your IP!
+
+# Multiple WireGuard clients
+wg_clients = {
+  laptop  = { address = "10.10.0.2/32" }
+  phone   = { address = "10.10.0.3/32" }
+  tablet  = { address = "10.10.0.4/32" }
+}
+
+# Panel ports (accessible only via VPN)
+wg_easy_port    = 51821
+panel_3xui_port = 2053
+netdata_port    = 19999
+enable_netdata  = true

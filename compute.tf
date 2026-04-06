@@ -16,6 +16,18 @@ resource "random_id" "reality_short" {
   byte_length = 4
 }
 
+# Password for wg-easy
+resource "random_password" "wg_easy" {
+  length  = 16
+  special = false
+}
+
+# Password for 3x-ui
+resource "random_password" "panel_3xui" {
+  length  = 16
+  special = false
+}
+
 # Get latest Debian 12 AMI
 data "aws_ami" "debian" {
   most_recent = true
@@ -32,6 +44,8 @@ data "aws_ami" "debian" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_instance" "vpn" {
   ami                    = data.aws_ami.debian.id
   instance_type          = var.instance_type
@@ -47,12 +61,18 @@ resource "aws_instance" "vpn" {
   }
 
   user_data = templatefile("${path.module}/startup.sh.tpl", {
-    wg_port           = var.wg_port
-    wg_address        = var.wg_address
-    wg_client_address = var.wg_client_address
-    vless_port        = var.vless_port
-    vless_uuid        = random_uuid.vless.result
-    reality_short_id  = random_id.reality_short.hex
+    wg_port            = var.wg_port
+    wg_address         = var.wg_address
+    wg_clients         = var.wg_clients
+    vless_port         = var.vless_port
+    vless_uuid         = random_uuid.vless.result
+    reality_short_id   = random_id.reality_short.hex
+    wg_easy_port       = var.wg_easy_port
+    wg_easy_password   = random_password.wg_easy.result
+    panel_3xui_port    = var.panel_3xui_port
+    panel_3xui_password = random_password.panel_3xui.result
+    netdata_port       = var.netdata_port
+    enable_netdata     = var.enable_netdata
   })
 
   tags = { Name = var.vm_name }

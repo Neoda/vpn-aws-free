@@ -15,6 +15,15 @@ terraform {
       version = "~> 3.0"
     }
   }
+
+  # Remote state backend — uncomment after first apply, then run: terraform init -migrate-state
+  # backend "s3" {
+  #   bucket         = "vpn-tfstate-YOUR_ACCOUNT_ID"
+  #   key            = "vpn/terraform.tfstate"
+  #   region         = "us-east-1"
+  #   dynamodb_table = "vpn-terraform-lock"
+  #   encrypt        = true
+  # }
 }
 
 provider "aws" {

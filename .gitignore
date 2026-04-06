@@ -1,13 +1,15 @@
 .terraform/
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 *.tfvars
 !terraform.tfvars.example
 .terraform.lock.hcl
 ssh_key*
 *.pem
+*.key
 crash.log
 override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+.env

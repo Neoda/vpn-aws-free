@@ -46,6 +46,56 @@ resource "aws_eip_association" "vpn" {
   allocation_id = aws_eip.vpn.id
 }
 
+# VPC Flow Logs for security monitoring
+resource "aws_flow_log" "vpn" {
+  vpc_id          = aws_vpc.vpn.id
+  traffic_type    = "REJECT"
+  iam_role_arn    = aws_iam_role.flow_log.arn
+  log_destination = aws_cloudwatch_log_group.flow_log.arn
+}
+
+resource "aws_cloudwatch_log_group" "flow_log" {
+  name              = "/vpc/vpn-flow-logs"
+  retention_in_days = 7
+
+  tags = { Name = "vpn-flow-logs" }
+}
+
+resource "aws_iam_role" "flow_log" {
+  name = "vpn-flow-log-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "vpc-flow-logs.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "flow_log" {
+  name = "vpn-flow-log-policy"
+  role = aws_iam_role.flow_log.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+      ]
+      Effect   = "Allow"
+      Resource = "*"
+    }]
+  })
+}
+
 resource "aws_security_group" "vpn" {
   name        = "vpn-sg"
   description = "VPN server security group"
