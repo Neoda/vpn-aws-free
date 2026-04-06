@@ -44,8 +44,6 @@ data "aws_ami" "debian" {
   }
 }
 
-data "aws_caller_identity" "current" {}
-
 resource "aws_instance" "vpn" {
   ami                    = data.aws_ami.debian.id
   instance_type          = var.instance_type
